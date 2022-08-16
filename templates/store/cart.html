@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+
+<section class="section-content padding-y bg">
+    <div class="container">
+        {% include 'includes/alerts.html' %}
+    <!-- ============================ COMPONENT 1 ================================= -->
+    {% if not cart_items%}
+        <h2 class="text-center">El carrito de compras esta vacio</h2>
+        <br>
+        <div class="text-center">
+            <a href="{% url 'store' %}" class="btn btn-primary">Continua comprando</a>
+        </div>
+    {% else %}
+    <div class="row">
+        <aside class="col-lg-9">
+    <div class="card">
+    <table class="table table-borderless table-shopping-cart">
+    <thead class="text-muted">
+    <tr class="small text-uppercase">
+      <th scope="col">Productos</th>
+      <th scope="col" class="text-center" width="120">Cantidad</th>
+      <th scope="col" class="text-left" width="160">Precio</th>
+      <th scope="col" class="text-right" width="200"> </th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for cart_item in cart_items %}
+    <tr>
+        <td>
+            <figure class="itemside align-items-center">
+                
+                {% for item in cart_item.variations.all %}
+                <p id="edicion" class="edicion" hidden>{{item.variation_value}}</p>
+                <a href="{{ item.get_url_2 }}"><div class="aside"><img id="imagen" src="{{ item.image.url }}" class="img-sm"></div></a>
+                {% endfor %}
+                
+                
+                <figcaption class="info">                    
+                    {% for item in cart_item.variations.all %}
+                    <a href="{{ item.get_url_2 }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
+                    {% endfor %}
+                    <p id="titulo" class="titulo" hidden>{{cart_item.product.id}}</p>
+                    <p class="text-muted small">
+                        {% if cart_item.variations.all %}
+                            {% for item in cart_item.variations.all %}
+                                {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }} <br>
+                                <p id="edicion" class="edicion" hidden>{{item.variation_value}}</p>
+                                
+                                {% endfor %}
+                        {% endif %}
+                        
+                    </p>
+
+                </figcaption>
+            </figure>
+        </td>
+        <td>
+            <!-- col.// -->
+                        <div class="col">
+                            <div class="input-group input-spinner">
+                                <div class="input-group-prepend">
+                                <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" class="btn btn-light" type="button" id="button-plus"> <i class="fa fa-minus"></i> </a>
+                                </div>
+                                <input type="text" class="form-control"  value="{{ cart_item.quantity }}">
+                                <div class="input-group-append">
+
+                                  <form action="{% url 'add_cart' cart_item.product.id  %}" method="post">
+                                    {% csrf_token %}
+                                    {% for item in cart_item.variations.all %}
+                                        <input type="hidden" name="{{ item.variation_category | lower }}" value="{{ item.variation_value | capfirst }}">
+                                    {% endfor %}
+                                    <button class="btn btn-light" type="submit" id="button-minus"> <i class="fa fa-plus"></i> </button>
+
+                                  </form>
+
+                                </div>
+                            </div> <!-- input-group.// -->
+                        </div> <!-- col.// -->
+        </td>
+        <td>
+            <div class="price-wrap">
+                <var class="price">$  {{ cart_item.sub_total }}  </var>
+                <small class="text-muted"> $ {{ cart_item.product.price }}    cada uno + {{cart_item.product.recargo_interior}} (RI)</small>
+            </div> <!-- price-wrap .// -->
+        </td>
+        <td class="text-right">
+        <a href="{% url 'remove_cart_item' cart_item.product.id cart_item.id %}" class="btn btn-danger"> Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+
+</tbody>
+    </table>
+    </div> <!-- card.// -->
+
+        </aside> <!-- col.// -->
+        <aside class="col-lg-3">
+
+            <div class="card">
+            <div class="card-body">
+                <dl class="dlist-align">
+                  <dt>Total Pedido:</dt>
+                  <dd class="text-right text-dark b"><strong>$ {{total}}</strong></dd>
+                </dl>
+                <hr>
+                
+                <a href="{% url 'place_order' %}" class="btn btn-primary btn-block"> Hacer Pedido </a>
+                <a href="{% url 'store' %}" class="btn btn-light btn-block">Continua comprando</a>
+            </div> <!-- card-body.// -->
+            </div> <!-- card.// -->
+
+    </aside> <!-- col.// -->
+
+
+    </div> <!-- row.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    {% endif %}
+    </div> <!-- container .//  -->
+</section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+    <script>
+        // Funcion que debe estar siempre 
+         function getCookie(name) {
+           var cookieValue = null;
+           if (document.cookie && document.cookie != '') {
+               var cookies = document.cookie.split(';');
+               for (var i = 0; i < cookies.length; i++) {
+                   var cookie = jQuery.trim(cookies[i]);
+                   // Does this cookie string begin with the name we want?
+                   if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                       cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                       break;
+                   }
+               }
+           }
+           return cookieValue;
+       }
+       
+function Buscar(){
+    var csrftoken = getCookie('csrftoken');  
+         var edicion = $("#edicion").text();
+         alert("edicion="+edicion)
+         var titulo = $("#titulo").text();
+         alert("titulo="+titulo)
+         var urls="http://127.0.0.1:8000/store/get_ajax_titulo/"
+         var url = new URL(urls),
+           params = {titulo:titulo, edicion:edicion}
+       Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+         //alert(url);
+       
+           fetch(url, {
+             headers:{
+                 'Accept': 'application/json',
+                 'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+             },
+             method: 'GET',     
+         })
+         .then(response => response.json())
+         .then(data => {
+         console.log(data)
+         var content = data;
+         console.log("imagen="+content.data.image);
+         var img = document.getElementById('imagen')
+         img.src = content.data.image;  
+       });
+    };       
+    
+       </script>
+
+{% endblock %}

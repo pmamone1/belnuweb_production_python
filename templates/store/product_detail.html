@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="section-content padding-y bg">
+  <div class="container">
+
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+      <div class="row no-gutters">
+        <aside class="col-md-6">
+          <article class="gallery-wrap">
+            <div class="img-big-wrap mainImage">
+              {% if edicion.image.url %}
+              <center><img id="imagen_ed" src="{{ edicion.image.url }}"></center>
+              {% else %}
+              <center><img id="imagen_ed" src="{{ single_product.images.url }}"></center>
+              {% endif %}
+            </div> <!-- img-big-wrap.// -->
+
+          </article> <!-- gallery-wrap .end// -->
+
+          <ul class="thumb">
+              <li>
+                  <a href="{{ single_product.images.url }}" target="mainImage"><img id="imagen_ed" src="{{single_product.images.url}}" alt="Imagen del producto">  </a>
+                  {% for i in product_gallery %}
+                      <a href="{{ i.image.url }}" target="mainImage"><img src="{{i.image.url}}" alt="Imagen del producto">  </a>
+                  {% endfor %}
+              </li>
+          </ul>
+
+        </aside>
+        <main class="col-md-6 border-left">
+
+          <form action="{% url 'add_cart' single_product.id %}" method="POST">
+            {% csrf_token %}
+            
+            <article class="content-body">
+
+              <h2 class="title">{{ single_product.product_name }}</h2>
+              <div class="rating-star">
+                  <span>
+                        <i class="fa fa-star{% if single_product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.averageReview < 1.5 %}-o{% elif single_product.averageReview >= 1.5 and single_product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.averageReview < 2.5 %}-o{% elif single_product.averageReview >= 2.5 and single_product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.averageReview < 3.5 %}-o{% elif single_product.averageReview >= 3.5 and single_product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.averageReview < 4.5 %}-o{% elif single_product.averageReview >= 4.5 and single_product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                  </span>
+              </div>
+              <span>  Comentarios </span>
+<br>
+<!--
+              <div class="mb-2.5" style="font-size:1.5em;"><strong>{{ single_product.product_name }}</strong></div>
+    -->          
+              <div id="titulo" name="titulo" hidden>{{ single_product.id }}</div>
+              
+              {% if edicion.subtitulo %}
+              <p id="subtitulo" name="subtitulo" class="mb-3" style="font-size:1.1em; color:grey;">{{edicion.subtitulo}}</p>
+              {% else %}
+              
+              <p id="subtitulo" name="subtitulo" class="mb-3" style="font-size:1.1em; color:grey;font-weight: bold;"></p>
+              {% endif %}
+              <div class="mb-3">
+                <span class="price h4">$ {{ single_product.price }}</span><span style="font-size:0.8em"> + {{single_product.recargo_interior}} (RI)</span>
+              </div>
+
+              <p> {{ single_product.description }} </p>
+
+
+              <hr>
+
+              <div class="row">
+                <div class="item-option-select">
+                  <h6>Seleccione Edición</h6>
+                  <select class="form-control" id="edicion" name="edicion" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    {% for i in single_product.variation_set.edicion  %}
+                    {% if edicion.variation_value == i.variation_value %}
+                    <option value="{{ i.variation_value | lower }}" selected>{{ i.variation_value | capfirst }}</option>
+                    {% else %}
+                    <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                    {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div> 
+              
+<!--            
+
+              <div class="row">
+                <div class="item-option-select">
+                  <h6>Seleccione Talla</h6>
+                  <select class="form-control" name="talla" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    {% for i in single_product.variation_set.tallas %}
+                    <option value="{{ i.variation_value | lower }}">{{ i.variation_value | capfirst }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>  row.// 
+-->
+              <hr>
+              <h5 id="sin_stock" style="color:red; font-size:0.9em;"></h5>
+              <h5 id="poco_stock" style="color:blue; font-size:0.9em;"></h5>
+              
+              <button id="carrito" type="submit"  class="btn  btn-primary"> <span class="text">Agregar al Carrito</span> <i class="fas fa-shopping-cart"></i>  </button>
+              
+            </article> <!-- product-info-aside .// -->
+
+          </form>
+
+
+
+        </main> <!-- col.// -->
+      </div> <!-- row.// -->
+    </div> <!-- card.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+
+    <br>
+
+    <div class="row">
+      <div class="col-md-9">
+
+        <form action="{% url 'submit_review' single_product.id %}" method="post">
+          {% csrf_token %}
+          <h5>Escribe Tu Comentario</h5>
+
+          <div class="">
+            <label for="">Como calificarias este producto?</label>
+            <br>
+            <div class="rate">
+                <input type="radio" name="rating" value="5" id="rating10"><label for="rating10" title="5"></label>
+                <input type="radio" name="rating" value="4.5" id="rating9"><label for="rating9" title="4.5" class="half"></label>
+                <input type="radio" name="rating" value="4" id="rating8"><label for="rating8" title="4"></label>
+                <input type="radio" name="rating" value="3.5" id="rating7"><label for="rating7" title="3.5" class="half"></label>
+                <input type="radio" name="rating" value="3" id="rating6"><label for="rating6" title="3"></label>
+                <input type="radio" name="rating" value="2.5" id="rating5"><label for="rating5" title="2.5" class="half"></label>
+                <input type="radio" name="rating" value="2" id="rating4"><label for="rating4" title="2"></label>
+                <input type="radio" name="rating" value="1.5" id="rating3"><label for="rating3" title="1.5" class="half"></label>
+                <input type="radio" name="rating" value="1" id="rating2"><label for="rating2" title="1"></label>
+                <input type="radio" name="rating" value="0.5" id="rating1"><label for="rating1" title="0.5" class="half"></label>
+            </div>
+            <br>
+
+            Titulo de comentario:
+            <input type="text" class="form-control" name="subject" value="">
+            <br>
+
+            Comentario:
+            <textarea name="review" rows="4" class="form-control" ></textarea>
+            <br>
+            {% if user.is_authenticated %}
+
+              {% if orderproduct %}
+                <input type="submit" name="" value="Enviar Comentario" class="btn btn-primary">
+              {% else %}
+                <p>Debe primero comprar el producto para poder enviar un comentario</p>
+              {% endif %}
+
+            {% else %}
+              <p>Para enviar un comentario debes estar registrado <span><a href="{% url 'login' %}"> Inicia Sesion </a></span></p>
+            {% endif %}
+          </div>
+
+          {% include 'includes/alerts.html' %}
+
+        </form>
+      
+
+        <header class="section-heading">
+          <h3>Calificacion de Clientes </h3>
+
+          <div class="rating-star">
+              <span>
+                    <i class="fa fa-star{% if single_product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_product.averageReview < 1.5 %}-o{% elif single_product.averageReview >= 1.5 and single_product.averageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_product.averageReview < 2.5 %}-o{% elif single_product.averageReview >= 2.5 and single_product.averageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_product.averageReview < 3.5 %}-o{% elif single_product.averageReview >= 3.5 and single_product.averageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                    <i class="fa fa-star{% if single_product.averageReview < 4.5 %}-o{% elif single_product.averageReview >= 4.5 and single_product.averageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+              </span>
+          </div>
+
+
+
+        </header>
+        {% for review in reviews %}
+        <article class="box mb-3">
+          <div class="icontext w-100">
+            <div class="text">
+              <span class="date text-muted float-md-right">{{ review.updated_at }}</span>
+              <h6 class="mb-1">{{ review.user.full_name }}</h6>
+              <div class="rating-star">
+                  <span>
+                        <i class="fa fa-star{% if review.rating == 0.5 %}-half-o{% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if review.rating == 1.5 %}-half-o{% elif review.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if review.rating == 2.5 %}-half-o{% elif review.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if review.rating == 3.5 %}-half-o{% elif review.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if review.rating == 4.5 %}-half-o{% elif review.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
+                  </span>
+              </div>
+            </div>
+          </div> <!-- icontext.// -->
+          <div class="mt-3">
+            <h6>{{ review.subject }}</h6>
+            <p>
+              {{ review.review }}
+            </p>
+          </div>
+        </article>
+        {% endfor %}
+
+
+      </div> <!-- col.// -->
+    </div> <!-- row.// -->
+
+
+  </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+<script>
+ // Funcion que debe estar siempre 
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$("#edicion").change(function (e) {
+  e.preventDefault();
+  var edicion = $("#edicion").val();
+  //alert("edicion="+edicion)
+  var titulo = $("#titulo").text();
+  //alert("titulo="+titulo)
+  var urls="http://127.0.0.1:8000/store/get_ajax_titulo/"
+  var url = new URL(urls),
+    params = {titulo:titulo, edicion:edicion};
+Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+  //alert(url);
+
+    fetch(url, {
+      headers:{
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest', //Necessary to work with request.is_ajax()
+      },
+      method: 'GET',     
+  })
+  .then(response => response.json())
+  .then(data => {
+  console.log(data)
+  var content = data;
+  console.log("content="+content.data.subtitulo);
+  document.getElementById('subtitulo').innerHTML=content.data.subtitulo;
+  console.log("imagen="+content.data.image);
+  var img = document.getElementById('imagen_ed')
+  img.src = content.data.image;  
+  console.log("stock="+content.data.stock);
+  document.getElementById('poco_stock').innerHTML="Quedan "+ content.data.stock +" en stock";
+  document.getElementById('sin_stock').innerHTML="Producto fuera de stock";
+  if (content.data.stock <= 0) {
+    document.getElementById('carrito').hidden=true;
+    document.getElementById('sin_stock').hidden=false;
+    document.getElementById('poco_stock').hidden=true;
+  }else if (content.data.stock > 0 && content.data.stock < 6 ) {
+    document.getElementById('carrito').hidden=false;
+    document.getElementById('sin_stock').hidden=true;
+    document.getElementById('poco_stock').hidden=false;
+  }else{
+    document.getElementById('carrito').hidden=false;
+    document.getElementById('sin_stock').hidden=true;
+    document.getElementById('poco_stock').hidden=true;
+  }
+});
+
+});
+
+</script>
+
+
+
+{% endblock %}

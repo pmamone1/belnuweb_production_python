@@ -1,0 +1,12 @@
+{% autoescape off %}
+Hola {{ user.last_name }},{{user.first_name}}, 
+
+te pedimos que te comuniques con tu distribuidora Belnu.
+
+Por alguna razon tu pedido {{ order.order_number }} se ha cancelado
+
+http://{{domain}}
+
+Saludos de Belnu Pedidos Web!
+
+{% endautoescape %}

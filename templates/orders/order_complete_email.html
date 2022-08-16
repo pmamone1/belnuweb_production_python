@@ -1,0 +1,20 @@
+{% autoescape off %}
+Has realizado con exito el pedido!
+En las proximas 48hs estaras recibiendo el mismo, junto
+con el paquete del dia.
+
+Detalle del Pedido:
+
+    Vendedor : {{ numero_vendedor}} - {{ nombre_vendedor }}
+    Nombre y Apellido: {{ nombre_completo }}
+    Nro. de Pedido: #  {{ numero_pedido }}
+    Link para ver pedido:{{domain}}{% url 'selected_order' order_id %}
+    Estado del Pedido: {{ status }}
+    Total $ {{ grand_total }}
+    
+    ________________________________________________________________________________
+
+        
+Gracias por hacer tu pedido en Belnu Pedidos Web!
+
+{% endautoescape %}

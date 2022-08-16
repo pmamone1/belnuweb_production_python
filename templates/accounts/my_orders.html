@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    {% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+        {% include 'includes/dashboard_sidebar.html' %}
+
+
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+
+              <form action="{% url 'filtrar_pedido' %}" method="POST">
+                {% csrf_token %}
+                {% if users.is_admin %}
+                  {% if filtro == 'Todos' %}
+                    <strong class="d-inline-block mr-2" id="titulo_pedidos">Mostrar {{ filtro }} los Pedidos</strong>
+              {% else %}
+                <strong class="d-inline-block mr-2" id="titulo_pedidos">Mostrar pedidos {{ filtro }}</strong>
+              {% endif %}
+              {% else %}
+              {% if filtro == 'Todos' %}
+                <span class="d-inline-block mr-2" id="titulo_pedidos">Mostrar {{ filtro }} los Pedidos de></span><span style="color:green"><strong>{{user.numero_vendedor}}-{{user.nombre_vendedor}}</strong></span>
+              {% else %}
+                <span class="d-inline-block mr-2" id="titulo_pedidos">Mostrar pedidos {{ filtro }} de</span><span style="color:green"><strong>{{user.numero_vendedor}}-{{user.nombre_vendedor}}</strong></span>
+              {% endif %}
+              {% endif %}
+              <span style="margin-left:5vw;">Filtrar Pedidos:</span>
+              
+                <span><select id="filtro" name="filtro" style="border-radius:10px;padding:3px;margin-left:2px;">
+                  <option id="op0" value="0">{{filtro}}</option>
+                  <option id="1" value="1">Todos</option>
+                  <option id="2" value="2">Pendientes</option>
+                  <option id="3" value="3">Completados</option>
+                  <option id="4" value="4">Cancelados</option>
+                </select>
+                </span>
+                <span><button id="boton_filtro" type="submit" class="btn btn-success" style="width:80px;border-radius:15px;padding:5px;margin-left:5px;" disabled>Filtrar</button></span>
+              </form>
+
+              {% if users.is_admin %}
+              {% if orders %}
+              <hr>
+              <div class="container">
+              
+                <form action="{% url 'exporta_pedidos_xls' %}" method="POST">
+                  {% csrf_token %}    
+                <button type="submit" id="btn" class="btn btn-outline-success" disabled="true">Cumplir Pedidos Aceptados</button>
+                </form>
+
+              </div>
+              {% endif %}
+              {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-12">
+                          <table class="table table-hover">
+                              <thead>
+                                <tr>
+                                  <th scope="col"># Pedido</th>
+                                  <th scope="col" style="text-align:center;">Numero Vendedor</th>
+                                  
+                                  <th scope="col">Total Pedido</th>
+                                  <th scope="col" style="width:10px;padding:30px">Fecha</th>
+                                  <th scope="col">Estado</th>
+                                  {% if users.is_admin %}
+                                  <th scope="col" id="lblborrar" style="text-align:center;">Cancelar Pedido</th>
+                                  {% endif %}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  
+                                      {% for order in orders %}
+                                      <tr>
+                                        <th scope="row"><a href="{% url 'selected_order' order.id %}">{{ order.order_number }}</a></th>
+                                        <td style="text-align:center; color:green;"><strong>{{order.numero_vendedor}}</strong></td>
+                                        
+                                        <td>${{order.order_total}}</td>
+                                        <td>{{order.created_at|date:"d-m-y" }}</td>
+                                        {% if order.status == 'Accepted' %}
+                                          <td style="color:blue;">Pendiente</td>
+                                        {% elif order.status == 'Cancelado' %}
+                                          <td style="color:red;">{{ order.status_verbose }}</td>
+                                          {% elif order.status == 'Completed' %}
+                                          <td style="color:green;">{{ order.status_verbose }}</td>
+                                          {% endif%}
+                                            
+                                        {% if users.is_admin  %}
+                                      
+                                        {% if order.status == 'Accepted' %}
+
+                                        <form action="{% url 'borrar_pedido' order.id %}" method="POST">
+                                          {% csrf_token %}
+                                        <td style="text-align:center;"><button id="btn-borrar" type="submit" style="font-size:0.5em" class="btn btn-danger">x</button></td>  
+                                        </form>
+
+                                        {% endif %}
+                                        {% endif %}
+                                      
+                                      </tr>
+                                      
+                                      {% endfor %}
+                                      
+                              </tbody>
+                              
+                      
+                
+                            </table>
+
+
+                    </div>
+
+
+
+
+
+                </div> <!-- row.// -->
+                <nav class="mt-4" aria-label="Page navigation sample">
+
+                    {% if orders.has_other_pages %}
+                    <ul class="pagination">
+          
+                      {% if orders.has_previous %}
+                      <li class="page-item"><a class="page-link" href="?page={{orders.previous_page_number}}">Anterior</a></li>
+                      {% else %}
+                      <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                      {% endif %}
+          
+                      {% for i in orders.paginator.page_range %}
+          
+                        {% if orders.number == i %}
+                          <li class="page-item active"><a class="page-link" href="#">{{i}}</a></li>
+                        {% else %}
+                          <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                        {% endif %}
+          
+                      {% endfor %}
+          
+                      {% if orders.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{orders.next_page_number}}">Siguiente</a></li>
+                      {% else %}
+                        <li class="page-item disabled"><a class="page-link" href="#">Siguiente</a></li>
+                      {% endif %}
+          
+                    </ul>
+                    {% endif %}
+          
+                  </nav>
+                
+            </div> <!-- card-body .// -->
+
+            </article> <!-- order-group.// -->
+
+                    </main>
+    </div> <!-- row.// -->
+
+</div>
+
+
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    <script>
+      var boton_filtro = document.getElementById("boton_filtro");
+      var filtro = document.getElementById("filtro");
+      var button = document.getElementById("btn");
+      var op0 = document.getElementById("op0");
+
+      $( document ).ready(function() {
+        if(op0.innerHTML =="Pendientes"){
+          button.disabled = false;
+        }
+    });
+
+      boton_filtro.addEventListener("change", modifyText);
+     
+      filtro.addEventListener("click", activarBoton);
+
+      function activarBoton(){
+        
+        if(filtro.value != 0){
+          boton_filtro.disabled = false;
+        }
+      }
+      function modifyText() {
+        alert("filtro"+str(filtro))
+        if(filtro==1){
+          $("#1").attr("selected", "selected");
+          $("#titulo_pedidos").text("Todos los Pedidos");
+        }
+        if(filtro==2){
+          document.getElementById("2").classList.add = "selected";
+          $("#titulo_pedidos").text("Pedidos Pendientes");
+          button.disabled = false;
+        }
+        if(filtro==3){
+          document.getElementById("3").classList.add = "selected";
+          $("#titulo_pedidos").text("Pedidos Enviados");
+        }
+        if(filtro==4){
+          document.getElementById("4").classList.add = "selected";
+          $("#titulo_pedidos").text("Pedidos Cancelados");
+        }
+        else{
+          filtro=filtro
+          $("#titulo_pedidos").text("Todos los Pedidos");
+        }
+      }
+     
+           
+    </script>
+    
+
+{% endblock %}

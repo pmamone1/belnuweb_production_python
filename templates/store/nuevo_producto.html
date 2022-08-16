@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    {% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+        {% include 'includes/dashboard_sidebar.html' %}
+
+
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3"> Sesion iniciada de:  </strong>
+                <span>  {{ user.full_name }} --- {{userprofile.numero_vendedor}}-{{userprofile.nombre_vendedor}} </span>
+                {% if user.is_admin %}
+                <span style="color:#1D521C;margin-left:25px; background-color:#7CCD7B; padding:5px;"><strong> Administrador</strong> </span>
+                {% endif %}
+                
+            </header>
+            <div class="card-body" style="padding-left:20em;padding-top:5vh; margin-bottom:5vh;">
+                <div class="row">
+                <form action="{% url 'nuevo_producto' %}" method="POST" class="post-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <br>
+                <button type="submit" class="save btn btn-primary">Guardar Producto</button>
+                </form>
+                    
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+
+            </article> <!-- order-group.// -->
+        </main>
+    </div> <!-- row.// -->
+    </div>
+
+
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}

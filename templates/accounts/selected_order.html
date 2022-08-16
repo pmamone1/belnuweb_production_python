@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+    {% include 'includes/alerts.html' %}
+
+    <div class="container">
+        <div class="row">
+        {% include 'includes/dashboard_sidebar.html' %}
+
+
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3"> Datos del Pedido # <span style ="color:blue;margin-left:15px"> {{ order.order_number }}</span></strong>
+            </header>
+            <div class="card-body">
+                <div class="row">
+                    <div class="container" style="margin: 0 auto;width: 50%;padding: 50px;background: #f1f1f1;margin-top: 50px;margin-bottom: 50px;">
+                        <div class="row invoice row-printable">
+                            <div class="col-md-12">
+                                <!-- col-lg-12 start here -->
+                                <div class="panel panel-default plain" id="dash_0">
+                                    <!-- Start .panel -->
+                                    <div class="panel-body p30">
+                                        <div class="row">
+                                            <!-- Start .row -->
+                                            <div class="col-lg-6">
+                                                <!-- col-lg-6 start here -->
+                                                
+                                            </div>
+                                            <!-- col-lg-6 end here -->
+                                            <div class="col-lg-6">
+                                                <!-- col-lg-6 start here -->
+                                                <div class="invoice-from">
+                                                    <ul class="list-unstyled text-left" style="margin-left:-200px;">
+                                                        
+                                                        <li>Vendedor : {{ order.numero_vendedor}} - {{ order.nombre_vendedor }}</li>
+                                                        <li>Nombre y Apellido: {{ order.full_name }}</li>
+                                                        {% if order.status == 'Completed' %}
+                                                        <li>Estado del Pedido:<strong style="color:green"> {{ order.status_verbose }}</strong></li>
+                                                        <li>Nro. de Pedido: # {{ order.order_number }} </li>
+                                                        {% elif order.status == 'Accepted' %}
+                                                        <li>Estado del Pedido:<strong style="color:blue"> Pendiente</strong></li>
+                                                        {% else %}
+                                                        <li>Estado del Pedido:<strong style="color:red"> {{ order.status_verbose }}</strong></li>
+                                                        {% endif %}
+                                                        <li>Fecha del Pedido: {{ fecha|date:"d-m-y" }}</li>    
+                                                        
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                                <div class="invoice-items">
+                                                    <div class="table-responsive" style="overflow: hidden; outline: none;" tabindex="0">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="per70 text-center">Descripción</th>
+                                                                    <th class="per5 text-center">Cantidad</th>
+                                                                    <th class="per25 text-center">Total</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                    
+                                                                {% for item in order_product %}
+                                                                <tr>
+                                                                    <td>
+                                                                        {{item.product.product_name}}
+                                                                        <p class="text-muted small">
+                                                                            {% if item.variation.all %}
+                                                                              {% for i in item.variation.all%}
+                                                                                  {{ i.variation_category | capfirst }} : {{ i.variation_value | capfirst }} <br>
+                                                                              {% endfor %}
+                                                                            {% endif %}
+                                                                        </p>
+                                                                    </td>
+                                                                    <td class="text-center">{{ item.quantity }}</td>
+                                                                    <td class="text-center">$ {{item.product_price}}</td>
+                                                                </tr>
+                                                              {% endfor %}
+                                                              
+                                                              
+                                                            </tbody>
+                                                            <tfoot>
+                                                                
+                                                                <tr>
+                                                                    <th colspan="1" class="text-center">Total Pedido:</th>
+                                                                    <th colspan="2" class="text-right"><strong>$ {{ order.order_total }}</strong></th>
+                                                                </tr>
+                                                            </tfoot>
+                                                            
+                                                        </table>
+                                                        <nav class="mt-4" aria-label="Page navigation sample">
+
+                                                            {% if order_p.has_other_pages %}
+                                                            <ul class="pagination">
+                                                  
+                                                              {% if order_p.has_previous %}
+                                                              <li class="page-item"><a class="page-link" href="?page={{order_p.previous_page_number}}">Anterior</a></li>
+                                                              {% else %}
+                                                              <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                                                              {% endif %}
+                                                  
+                                                              {% for i in order_p.paginator.page_range %}
+                                                  
+                                                                {% if order_p.number == i %}
+                                                                  <li class="page-item active"><a class="page-link" href="#">{{i}}</a></li>
+                                                                {% else %}
+                                                                  <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                                                                {% endif %}
+                                                  
+                                                              {% endfor %}
+                                                  
+                                                              {% if order_p.has_next %}
+                                                                <li class="page-item"><a class="page-link" href="?page={{order_p.next_page_number}}">Siguiente</a></li>
+                                                              {% else %}
+                                                                <li class="page-item disabled"><a class="page-link" href="#">Siguiente</a></li>
+                                                              {% endif %}
+                                                  
+                                                            </ul>
+                                                            {% endif %}
+                                                  
+                                                          </nav>
+                                                    </div>
+                                                    
+                                                </div>
+                    
+                    </div>
+
+
+
+
+
+                </div> <!-- row.// -->
+                
+            </div> <!-- card-body .// -->
+
+            </article> <!-- order-group.// -->
+
+                    </main>
+    </div> <!-- row.// -->
+
+</div>
+
+
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+{% endblock %}
