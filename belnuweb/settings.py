@@ -1,6 +1,6 @@
 import environ
 from pathlib import Path
-
+import mysql.connector
 
 # Initialise environment variables
 env = environ.Env()
@@ -95,7 +95,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-"""
+
 
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -109,7 +109,17 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': 'belnuweb_pedidos',
+        'USER': 'root',
+        'PASSWORD': 'Pablo1612',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
