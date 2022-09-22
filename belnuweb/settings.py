@@ -102,10 +102,10 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'BelnuWeb',
-        'USER': 'postgres',
-        'PASSWORD': 'pablo1612',
-        'HOST': 'localhost',
+        'NAME': 'pmamone1$belnuweb_pedidos',
+        'USER': 'pmamone1',
+        'PASSWORD': 'Pablo1612',
+        'HOST': 'pmamone1.mysql.pythonanywhere-services.com',
         'PORT': '5432',
     }
 }
